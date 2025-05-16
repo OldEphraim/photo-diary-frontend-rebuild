@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, KeyboardAvoidingView, Platform } from 'react-native';
-import CustomTextInput from './src/components/CustomInput';
-import CustomButton from './src/components/CustomButton';
+import CustomTextInput from '../components/CustomInput';
+import CustomButton from '../components/CustomButton';
 import { useForm} from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
