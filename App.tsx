@@ -1,23 +1,42 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import CustomTextInput from './src/components/CustomInput';
+import CustomButton from './src/components/CustomButton';
+import { useState } from 'react';
+import { useForm} from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const signInSchema = z.object({
+  email: z.string({ message: 'Email is required' }).email('Invalid email'),
+  password: z
+    .string({ message: 'Password is required' })
+    .min(8, 'Password should be at least 8 characters long'),
+});
+
+type SignInFields = z.infer<typeof signInSchema>;
 
 export default function App() {
+  const { control, handleSubmit } = useForm({
+    resolver: zodResolver(signInSchema),
+  });
+
+  const onSignIn = (data: SignInFields) => {
+    // manual validation
+
+    console.log('Sign in: ', data.email, data.password);
+  };
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height' } style={styles.container}>
       <Text style={styles.title}>Sign in</Text>
 
-      <TextInput placeholder="Email" style={styles.input} autoFocus autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
-      <TextInput placeholder="Password" style={styles.input} secureTextEntry />
+      <View style={styles.form}>
+        <CustomTextInput control={control} name="email" placeholder="Email" autoFocus autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
+        <CustomTextInput control={control} name="password" placeholder="Password" secureTextEntry />
+      </View>
 
-      <Button title="Sign in" onPress={() => {}} />
-
-        <Pressable onPress={() => {
-          console.log('pressed');
-        }}
-        style={styles.button}
-        >
-          <Text style={styles.buttonText}>Sign in</Text>
-        </Pressable>
+       <CustomButton onPress={handleSubmit(onSignIn)} text="Sign in" />
 
       <StatusBar style="auto" />
     </KeyboardAvoidingView>
@@ -32,25 +51,11 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 20,
   },
+  form: {
+    gap: 5,
+  },
   title: {
     fontSize: 24,
     fontWeight: '600',
   },
-  input: {
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
-    borderColor: '#ccc',
-  },
-  button: {
-    backgroundColor: '#4353FD',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center', 
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  }
 });
