@@ -1,8 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, Text, View, KeyboardAvoidingView, Platform } from 'react-native';
 import CustomTextInput from './src/components/CustomInput';
 import CustomButton from './src/components/CustomButton';
-import { useState } from 'react';
 import { useForm} from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,7 +16,7 @@ const signInSchema = z.object({
 type SignInFields = z.infer<typeof signInSchema>;
 
 export default function App() {
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<SignInFields>({
     resolver: zodResolver(signInSchema),
   });
 
