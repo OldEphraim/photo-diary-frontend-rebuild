@@ -6,7 +6,7 @@ export default function App() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height' } style={styles.container}>
       <Text style={styles.title}>Sign in</Text>
 
-      <TextInput placeholder="Email" style={styles.input} />
+      <TextInput placeholder="Email" style={styles.input} autoFocus autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
       <TextInput placeholder="Password" style={styles.input} secureTextEntry />
 
       <Button title="Sign in" onPress={() => {}} />
