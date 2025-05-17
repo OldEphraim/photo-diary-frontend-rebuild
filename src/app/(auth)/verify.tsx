@@ -3,7 +3,6 @@ import {
     Text,
     KeyboardAvoidingView,
     Platform,
-    View,
 } from 'react-native';
 import CustomInput from '@/components/CustomInput';
 import CustomButton from '@/components/CustomButton';
@@ -11,9 +10,8 @@ import CustomButton from '@/components/CustomButton';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'expo-router';
 
-import { useSignUp } from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useSignUp } from '@clerk/clerk-expo';
 
 const verifySchema = z.object({
 code: z.string({ message: 'Code is required' }).length(6, 'Invalid code'),
@@ -21,9 +19,23 @@ code: z.string({ message: 'Code is required' }).length(6, 'Invalid code'),
 
 type VerifyFields = z.infer<typeof verifySchema>;
 
+const mapClerkErrorToFormField = (error: any) => {
+    switch (error.meta?.paramName) {
+      case 'code':
+        return 'code';
+      default:
+        return 'root';
+    }
+  };
+
 export default function VerifyScreen() {
-const { control, handleSubmit } = useForm<VerifyFields>({
-  resolver: zodResolver(verifySchema),
+    const {
+        control,
+        handleSubmit,
+        setError,
+        formState: { errors },
+      } = useForm<VerifyFields>({
+        resolver: zodResolver(verifySchema),
 });
 
 const { signUp, isLoaded, setActive } = useSignUp();
@@ -41,9 +53,19 @@ const onVerify = async ({ code }: VerifyFields) => {
     } else {
       console.log('Verification failed');
       console.log(signUpAttempt);
+      setError('root', { message: 'Could not complete the sign up' });
     }
   } catch (err) {
-    console.log('Verify error: ', err);
+    if (isClerkAPIResponseError(err)) {
+        err.errors.forEach((error) => {
+          const fieldName = mapClerkErrorToFormField(error);
+          setError(fieldName, {
+            message: error.longMessage,
+          });
+        });
+      } else {
+        setError('root', { message: 'Unknown error' });
+      }
   }
 };
 
