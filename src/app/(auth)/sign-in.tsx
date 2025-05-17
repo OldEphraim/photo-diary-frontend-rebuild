@@ -12,6 +12,7 @@ import {
   import { useForm } from 'react-hook-form';
   import { z } from 'zod';
   import { zodResolver } from '@hookform/resolvers/zod';
+  import { useAuth } from '@/providers/AuthProvider';
   
   const signInSchema = z.object({
     email: z.string({ message: 'Email is required' }).email('Invalid email'),
@@ -26,11 +27,14 @@ import {
     const { control, handleSubmit } = useForm<SignInFields>({
       resolver: zodResolver(signInSchema),
     });
+
+    const { signIn } = useAuth();
   
     const onSignIn = (data: SignInFields) => {
       // manual validation
   
       console.log('Sign in: ', data.email, data.password);
+      signIn();
     };
   
     return (
