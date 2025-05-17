@@ -19,13 +19,15 @@ const ReviewView: React.FC<ReviewViewProps> = ({
   recordVideo,
 }) => {
   return (
-    <>
-      <CameraView
-        ref={cameraRef}
-        style={styles.camera}
-        facing="back"
-        mode="video"
-      />
+    <View style={styles.container}>
+      <View style={styles.cameraContainer}>
+        <CameraView
+          ref={cameraRef}
+          style={styles.camera}
+          facing="back"
+          mode="video"
+        />
+      </View>
       <View style={styles.controlsContainer}>
         {isRecordingVideo && (
           <View style={styles.recordingIndicatorContainer}>
@@ -55,14 +57,26 @@ const ReviewView: React.FC<ReviewViewProps> = ({
           )}
         </View>
       </View>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    camera: {
+    container: {
       flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    cameraContainer: {
+      width: '100%',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flex: 1,
+    },
+    camera: {
       aspectRatio: 3 / 4,
+      width: '90%', // Use percentage width to ensure proper scaling
       borderRadius: 10,
       overflow: 'hidden',
     },
@@ -103,4 +117,4 @@ const styles = StyleSheet.create({
     }
   });
   
-  export default ReviewView;  
+export default ReviewView;

@@ -4,6 +4,8 @@ import {
     KeyboardAvoidingView,
     Platform,
     View,
+    ScrollView,
+    SafeAreaView,
   } from 'react-native';
   import CustomInput from '@/components/CustomInput';
   import CustomButton from '@/components/CustomButton';
@@ -22,7 +24,7 @@ import {
   });
   
   type SignUpFields = z.infer<typeof signUpSchema>;
-
+  
   const mapClerkErrorToFormField = (error: any) => {
     switch (error.meta?.paramName) {
       case 'email_address':
@@ -45,7 +47,7 @@ import {
     });
   
     const { signUp, isLoaded } = useSignUp();
-
+  
     const onSignUp = async (data: SignUpFields) => {
       if (!isLoaded) return;
       
@@ -54,12 +56,11 @@ import {
           emailAddress: data.email,
           password: data.password,
         });
-
-
+  
         await signUp.prepareVerification({ strategy: 'email_code' });
-
+  
         router.push('/verify');
-    } catch (err) {
+      } catch (err) {
         console.log('Sign up error: ', err);
         if (isClerkAPIResponseError(err)) {
           err.errors.forEach((error) => {
@@ -79,46 +80,61 @@ import {
     };
   
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
-        <Text style={styles.title}>Create an account</Text>
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+        >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.title}>Create an account</Text>
   
-        <View style={styles.form}>
-          <CustomInput
-            control={control}
-            name='email'
-            placeholder='Email'
-            autoFocus
-            autoCapitalize='none'
-            keyboardType='email-address'
-            autoComplete='email'
-          />
+            <View style={styles.form}>
+              <CustomInput
+                control={control}
+                name='email'
+                placeholder='Email'
+                autoFocus
+                autoCapitalize='none'
+                keyboardType='email-address'
+                autoComplete='email'
+              />
   
-          <CustomInput
-            control={control}
-            name='password'
-            placeholder='Password'
-            secureTextEntry
-          />
-        {errors.root && (
-          <Text style={{ color: 'crimson' }}>{errors.root.message}</Text>
-        )}
-        </View>
+              <CustomInput
+                control={control}
+                name='password'
+                placeholder='Password'
+                secureTextEntry
+              />
+              {errors.root && (
+                <Text style={{ color: 'crimson' }}>{errors.root.message}</Text>
+              )}
+            </View>
   
-        <CustomButton text='Sign up' onPress={handleSubmit(onSignUp)} />
-        <Link href='/sign-in' style={styles.link}>
-          Already have an account? Sign in
-        </Link>
-      </KeyboardAvoidingView>
+            <CustomButton text='Sign up' onPress={handleSubmit(onSignUp)} />
+            <Link href='/sign-in' style={styles.link}>
+              Already have an account? Sign in
+            </Link>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
   
   const styles = StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
     container: {
       flex: 1,
       backgroundColor: '#fff',
+    },
+    scrollContent: {
+      flexGrow: 1,
       justifyContent: 'center',
       padding: 20,
       gap: 20,

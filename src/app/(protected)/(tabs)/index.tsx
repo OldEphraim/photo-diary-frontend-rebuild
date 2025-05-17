@@ -4,7 +4,8 @@ import {
   View,
   Text,
   Image,
-  Button,
+  StyleSheet,
+  TouchableOpacity,
   ScrollView,
   ActivityIndicator,
   Alert,
@@ -12,7 +13,8 @@ import {
 } from 'react-native'
 import { Video, ResizeMode } from 'expo-av'
 import { useUser, useAuth } from '@clerk/clerk-expo'
-import { SignOutButton } from '@/components/SignOutButton'
+import { Ionicons } from '@expo/vector-icons'
+import EmptyDiaryState from '@/components/EmptyDiaryState'
 import API_URL from '@/constants/api'
 
 interface DiaryEntry {
@@ -91,67 +93,150 @@ export default function DiaryHomeScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#fff" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4285F4" />
+        <Text style={styles.loadingText}>Loading your entries...</Text>
       </View>
     )
   }
 
   if (entries.length === 0) {
-    return (
-      <View style={{ flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Hello, {user?.emailAddresses[0].emailAddress}</Text>
-        <Text>Here's your diary overview (soon)</Text>
-        <SignOutButton />
-      </View>
-    )
+    return <EmptyDiaryState />
   }
 
   return (
-      <ScrollView
-        contentContainerStyle={{ padding: 20 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >  
-{entries.map((entry) => {
-  const isVideo = entry.media_url.endsWith('.mp4') || entry.media_url.includes('.mp4')
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >  
+      {entries.map((entry) => {
+        const isVideo = entry.media_url.endsWith('.mp4') || entry.media_url.includes('.mp4')
+        const formattedDate = new Date(entry.created_at).toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
 
-  return (
-    <View key={entry.id} style={{ marginBottom: 20 }}>
-      {isVideo ? (
-        <Video
-          source={{ uri: entry.media_url }}
-          style={{ height: 200, borderRadius: 10 }}
-          useNativeControls
-          resizeMode={ResizeMode.CONTAIN}
-          shouldPlay={false}
-        />
-      ) : (
-        <Image
-          source={{ uri: entry.media_url }}
-          style={{ height: 200, borderRadius: 10 }}
-        />
-      )}
-      <Text
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          color: '#000',
-          paddingHorizontal: 10,
-          paddingVertical: 4,
-          borderRadius: 6,
-          marginVertical: 5,
-        }}
-      >
-        {entry.caption}
-      </Text>
-      <Text style={{ color: '#aaa', fontSize: 12, marginTop: 4 }}>
-        {new Date(entry.created_at).toLocaleString()}
-      </Text>
-      <Button title="Delete" onPress={() => confirmDelete(entry.id)} />
-    </View>
-      )
-    })}
+        return (
+          <View key={entry.id} style={styles.entryCard}>
+            {isVideo ? (
+              <Video
+                source={{ uri: entry.media_url }}
+                style={styles.mediaPreview}
+                useNativeControls
+                resizeMode={ResizeMode.COVER}
+                shouldPlay={false}
+              />
+            ) : (
+              <Image
+                source={{ uri: entry.media_url }}
+                style={styles.mediaPreview}
+                resizeMode="cover"
+              />
+            )}
+            
+            <View style={styles.entryInfo}>
+              <View style={styles.captionContainer}>
+                <Text style={styles.captionText}>
+                  {entry.caption || 'No caption'}
+                </Text>
+              </View>
+              
+              <View style={styles.entryFooter}>
+                <Text style={styles.dateText}>
+                  <Ionicons name="time-outline" size={14} color="#888" /> {formattedDate}
+                </Text>
+                
+                <TouchableOpacity 
+                  style={styles.deleteButton}
+                  onPress={() => confirmDelete(entry.id)}
+                >
+                  <Ionicons name="trash-outline" size={18} color="#ff4444" />
+                  <Text style={styles.deleteText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )
+      })}
     </ScrollView>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 30,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  entryCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  mediaPreview: {
+    height: 220,
+    width: '100%',
+  },
+  entryInfo: {
+    padding: 16,
+  },
+  captionContainer: {
+    marginBottom: 12,
+  },
+  captionText: {
+    fontSize: 16,
+    color: '#333',
+    lineHeight: 22,
+  },
+  entryFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#888',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    backgroundColor: '#fff0f0',
+  },
+  deleteText: {
+    fontSize: 14,
+    color: '#ff4444',
+    marginLeft: 6,
+  }
+});

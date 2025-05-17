@@ -4,11 +4,12 @@ import {
     KeyboardAvoidingView,
     Platform,
     View,
+    ScrollView,
+    SafeAreaView,
   } from 'react-native';
   import CustomInput from '@/components/CustomInput';
   import CustomButton from '@/components/CustomButton';
   import { Link } from 'expo-router';
-  
   import { useForm } from 'react-hook-form';
   import { z } from 'zod';
   import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,7 +24,7 @@ import {
   });
   
   type SignInFields = z.infer<typeof signInSchema>;
-
+  
   const mapClerkErrorToFormField = (error: any) => {
     switch (error.meta?.paramName) {
       case 'identifier':
@@ -39,11 +40,11 @@ import {
     const { control, handleSubmit, setError, formState: { errors } } = useForm<SignInFields>({
       resolver: zodResolver(signInSchema),
     });
-
+  
     console.log('Errors: ', JSON.stringify(errors, null, 2));
-
+  
     const { signIn, isLoaded, setActive } = useSignIn();
-
+  
     const onSignIn = async (data: SignInFields) => {
       if (!isLoaded) return;
   
@@ -61,9 +62,9 @@ import {
         }
   
         console.log('Sign in attempt: ', signInAttempt);
-    } catch (err) {
+      } catch (err) {
         console.log('Sign in error: ', JSON.stringify(err, null, 2));
-
+  
         if (isClerkAPIResponseError(err)) {
           err.errors.forEach((error) => {
             const fieldName = mapClerkErrorToFormField(error);
@@ -73,69 +74,112 @@ import {
           });
         } else {
           setError('root', { message: 'Unknown error' });
-        }    
-    }
+        }
+      }
   
       console.log('Sign in: ', data.email, data.password);
     };
   
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
-      >
-        <Text style={styles.title}>Sign in</Text>
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.container}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+        >
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.title}>Welcome Back</Text>
   
-        <View style={styles.form}>
-          <CustomInput
-            control={control}
-            name='email'
-            placeholder='Email'
-            autoFocus
-            autoCapitalize='none'
-            keyboardType='email-address'
-            autoComplete='email'
-          />
+            <View style={styles.form}>
+              <CustomInput
+                control={control}
+                name='email'
+                placeholder='Email'
+                autoCapitalize='none'
+                keyboardType='email-address'
+                autoComplete='email'
+              />
   
-          <CustomInput
-            control={control}
-            name='password'
-            placeholder='Password'
-            secureTextEntry
-          />
-        {errors.root && (
-          <Text style={{ color: 'crimson' }}>{errors.root.message}</Text>
-        )}
-        </View>
+              <CustomInput
+                control={control}
+                name='password'
+                placeholder='Password'
+                secureTextEntry
+              />
+              
+              {errors.root && (
+                <Text style={styles.errorText}>{errors.root.message}</Text>
+              )}
+            </View>
   
-        <CustomButton text='Sign in' onPress={handleSubmit(onSignIn)} />
+            <CustomButton text='Sign in' onPress={handleSubmit(onSignIn)} />
   
-        <Link href='/sign-up' style={styles.link}>
-          Don't have an account? Sign up
-        </Link>
-
-        <SignInWith />
-      </KeyboardAvoidingView>
+            <Link href='/sign-up' style={styles.link}>
+              Don't have an account? Sign up
+            </Link>
+  
+            <View style={styles.dividerContainer}>
+              <View style={styles.divider} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.divider} />
+            </View>
+  
+            <SignInWith />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
   
   const styles = StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: '#fff',
+    },
     container: {
       flex: 1,
       backgroundColor: '#fff',
+    },
+    scrollContent: {
+      flexGrow: 1,
       justifyContent: 'center',
       padding: 20,
       gap: 20,
     },
-    form: {
-      gap: 5,
-    },
     title: {
       fontSize: 24,
       fontWeight: '600',
+      marginBottom: 10,
+    },
+    form: {
+      gap: 10,
+    },
+    errorText: {
+      color: 'crimson',
+      marginTop: 6,
     },
     link: {
       color: '#4353FD',
       fontWeight: '600',
+      alignSelf: 'center',
+      marginTop: 5,
+    },
+    dividerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 15,
+    },
+    divider: {
+      flex: 1,
+      height: 1,
+      backgroundColor: '#e0e0e0',
+    },
+    dividerText: {
+      paddingHorizontal: 12,
+      color: '#999',
+      fontSize: 14,
     },
   });
