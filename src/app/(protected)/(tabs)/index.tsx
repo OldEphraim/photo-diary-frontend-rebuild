@@ -37,7 +37,7 @@ export default function DiaryHomeScreen() {
 
   const fetchEntries = async () => {
     try {
-      const token = await getToken()
+      const token = await getToken();
       const res = await fetch(`${API_URL}/entries`, {
         headers: { Authorization: `Bearer ${token}` },
       })

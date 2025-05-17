@@ -4,7 +4,6 @@ import {
     KeyboardAvoidingView,
     Platform,
     View,
-    Alert,
   } from 'react-native';
   import CustomInput from '@/components/CustomInput';
   import CustomButton from '@/components/CustomButton';
