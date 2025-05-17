@@ -31,7 +31,6 @@ export default function CustomInput<T extends FieldValues>({
               props.style,
               { borderColor: error ? 'crimson' : 'gray' },
             ]}          />
-          <Text style={styles.error}>{error?.message}</Text>
           {error ? (
             <Text style={styles.error}>{error.message}</Text>
           ) : (
