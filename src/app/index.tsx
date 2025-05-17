@@ -1,60 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, KeyboardAvoidingView, Platform } from 'react-native';
-import CustomTextInput from '../components/CustomInput';
-import CustomButton from '../components/CustomButton';
-import { useForm} from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Text, StyleSheet, View } from 'react-native';
+import { Link } from 'expo-router';
 
-const signInSchema = z.object({
-  email: z.string({ message: 'Email is required' }).email('Invalid email'),
-  password: z
-    .string({ message: 'Password is required' })
-    .min(8, 'Password should be at least 8 characters long'),
-});
-
-type SignInFields = z.infer<typeof signInSchema>;
-
-export default function App() {
-  const { control, handleSubmit } = useForm<SignInFields>({
-    resolver: zodResolver(signInSchema),
-  });
-
-  const onSignIn = (data: SignInFields) => {
-    // manual validation
-
-    console.log('Sign in: ', data.email, data.password);
-  };
-
+export default function Index() {
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height' } style={styles.container}>
-      <Text style={styles.title}>Sign in</Text>
-
-      <View style={styles.form}>
-        <CustomTextInput control={control} name="email" placeholder="Email" autoFocus autoCapitalize="none" keyboardType="email-address" autoComplete="email" />
-        <CustomTextInput control={control} name="password" placeholder="Password" secureTextEntry />
-      </View>
-
-       <CustomButton onPress={handleSubmit(onSignIn)} text="Sign in" />
-
-      <StatusBar style="auto" />
-    </KeyboardAvoidingView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome screen</Text>
+      <Link href='/sign-in'>Go to sign in</Link>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center',
     gap: 20,
-  },
-  form: {
-    gap: 5,
   },
   title: {
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
