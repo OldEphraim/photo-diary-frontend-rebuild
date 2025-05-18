@@ -24,14 +24,11 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
   const takePhoto = async () => {
     if (cameraRef.current) {
       try {
-        console.log("Taking photo...");
         const photo = await cameraRef.current.takePictureAsync();
-        console.log("📸 Captured photo URI:", photo.uri);
         
         setMediaUri(photo.uri);
         setIsVideo(false);
       } catch (error) {
-        console.error("❌ Failed to take photo:", error);
         Alert.alert('Error', 'Could not take photo.');
       }
     } else {
@@ -41,7 +38,6 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
 
   const recordVideo = async () => {
     if (!cameraRef.current) {
-      console.log("Camera ref is null");
       return;
     }
     
@@ -57,13 +53,10 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
         }, 1000);
         setTimerInterval(interval);
         
-        console.log("Starting video recording...");
-        
         // Create a timeout to force stop recording after maxDuration
         const maxDurationMs = 60 * 1000; // 60 seconds
         const recordingTimeout = setTimeout(() => {
           if (isRecordingVideo && cameraRef.current) {
-            console.log("Max duration reached, stopping recording...");
             try {
               cameraRef.current.stopRecording();
             } catch (e) {
@@ -75,7 +68,6 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
         // Start recording in the background
         cameraRef.current.recordAsync({ maxDuration: 60 })
           .then(videoResult => {
-            console.log("Video recording completed, result:", videoResult);
             
             // Clear the timer
             if (timerInterval) {
@@ -91,14 +83,12 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
               setMediaUri(videoResult.uri);
               setIsVideo(true);
             } else {
-              console.error("No video URI returned");
               Alert.alert('Error', 'Failed to get video.');
             }
             
             setIsRecordingVideo(false);
           })
           .catch(error => {
-            console.error("Video recording error:", error);
             
             // Clear the timer
             if (timerInterval) {
@@ -113,7 +103,6 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
             Alert.alert('Error', 'Could not complete video recording.');
           });
       } catch (error) {
-        console.error("Failed to start recording:", error);
         setIsRecordingVideo(false);
         
         if (timerInterval) {
@@ -126,18 +115,15 @@ export default function useVideoRecording(setMediaUri: (uri: string | null) => v
     } else {
       // Stop recording
       try {
-        console.log("Stopping video recording...");
         
         // This will cause the promise from recordAsync to resolve
         if (cameraRef.current) {
           cameraRef.current.stopRecording();
-          console.log("Stop recording requested");
         }
         
         // Note: We don't set isRecordingVideo to false here
         // That will be done in the promise resolution from recordAsync
       } catch (error) {
-        console.error("Error stopping recording:", error);
         setIsRecordingVideo(false);
         
         // Clear the timer

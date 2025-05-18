@@ -41,8 +41,6 @@ import {
       resolver: zodResolver(signInSchema),
     });
   
-    console.log('Errors: ', JSON.stringify(errors, null, 2));
-  
     const { signIn, isLoaded, setActive } = useSignIn();
   
     const onSignIn = async (data: SignInFields) => {
@@ -57,14 +55,9 @@ import {
         if (signInAttempt.status === 'complete') {
           setActive({ session: signInAttempt.createdSessionId });
         } else {
-          console.log('Sign in failed');
           setError('root', { message: 'Sign in could not be completed' });
         }
-  
-        console.log('Sign in attempt: ', signInAttempt);
-      } catch (err) {
-        console.log('Sign in error: ', JSON.stringify(err, null, 2));
-  
+      } catch (err) {  
         if (isClerkAPIResponseError(err)) {
           err.errors.forEach((error) => {
             const fieldName = mapClerkErrorToFormField(error);
@@ -76,8 +69,6 @@ import {
           setError('root', { message: 'Unknown error' });
         }
       }
-  
-      console.log('Sign in: ', data.email, data.password);
     };
   
     return (

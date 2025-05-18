@@ -61,12 +61,9 @@ import {
   
         router.push('/verify');
       } catch (err) {
-        console.log('Sign up error: ', err);
         if (isClerkAPIResponseError(err)) {
           err.errors.forEach((error) => {
-            console.log('Error: ', JSON.stringify(error, null, 2));
             const fieldName = mapClerkErrorToFormField(error);
-            console.log('Field name: ', fieldName);
             setError(fieldName, {
               message: error.longMessage,
             });
@@ -75,8 +72,6 @@ import {
           setError('root', { message: 'Unknown error' });
         }
       }
-  
-      console.log('Sign up: ', data.email, data.password);
     };
   
     return (

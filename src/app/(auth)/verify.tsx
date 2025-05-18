@@ -51,8 +51,6 @@ const onVerify = async ({ code }: VerifyFields) => {
     if (signUpAttempt.status === 'complete') {
       setActive({ session: signUpAttempt.createdSessionId });
     } else {
-      console.log('Verification failed');
-      console.log(signUpAttempt);
       setError('root', { message: 'Could not complete the sign up' });
     }
   } catch (err) {

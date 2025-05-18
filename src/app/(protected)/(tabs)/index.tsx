@@ -47,7 +47,6 @@ export default function DiaryHomeScreen() {
       data.sort((a: DiaryEntry, b: DiaryEntry) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       setEntries(data)
     } catch (err) {
-      console.error('❌ Failed to fetch entries:', err)
       Alert.alert('Error', 'Could not fetch your diary entries.')
     } finally {
       setIsLoading(false)
@@ -80,7 +79,6 @@ export default function DiaryHomeScreen() {
         throw new Error('Server rejected deletion')
       }
     } catch (err) {
-      console.error('❌ Delete error:', err)
       Alert.alert('Error', 'Failed to delete entry.')
     }
   }

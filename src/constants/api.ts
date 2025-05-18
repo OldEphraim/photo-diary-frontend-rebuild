@@ -8,7 +8,6 @@ if (!API_IP) {
   console.warn('API_IP is not defined in environment variables or app config!');
 }
 
-const API_URL = `http://${API_IP}:5050/api`;
-console.log('API URL configured as:', API_URL);
+const API_URL = `${API_IP}/api`;
 
 export default API_URL;
