@@ -15,14 +15,24 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oldephraim.photo-diary-auth-frontend"
+      "bundleIdentifier": "com.oldephraim.photo-diary-auth-frontend",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to let you capture daily photo and video journal entries.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone to allow you to record audio messages with your diary entries.",
+        "NSPhotoLibraryUsageDescription": "This app requires access to the photo library to let you select images for your diary entries.",
+        "NSPhotoLibraryAddUsageDescription": "This app requires access to the photo library to save your diary photos."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -30,7 +40,15 @@
     },
     "plugins": [
       "expo-router",
-      "expo-web-browser"
-    ]
+      "expo-web-browser",
+      "./plugins/withMediaPermissions",
+      "./plugins/withCameraAndMicrophone"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7a9b3c4a-d6e6-4d63-82c5-28eba4be7502"
+      }
+    }
   }
 }
